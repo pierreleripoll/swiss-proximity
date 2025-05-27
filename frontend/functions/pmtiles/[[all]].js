@@ -1,4 +1,10 @@
 export async function onRequestGet(ctx) {
+  // Add debugging
+  if (!ctx.env || !ctx.env.MEDIA) {
+    console.error("R2 bucket binding MEDIA is not configured");
+    return new Response("R2 bucket binding not configured", { status: 500 });
+  }
+
   const path = new URL(ctx.request.url).pathname.replace("/pmtiles/", "");
   const file = await ctx.env.MEDIA.get(path);
   if (!file) return new Response(null, { status: 404 });
