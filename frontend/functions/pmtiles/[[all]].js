@@ -16,6 +16,13 @@ export async function onRequestGet(ctx) {
 
   const range = ctx.request.headers.get("range");
 
+  // Cache headers for PMTiles files (cache for 1 day)
+  const cacheHeaders = {
+    "Cache-Control": "public, max-age=86400, immutable",
+    ETag: file.etag,
+    "Last-Modified": file.uploaded.toUTCString(),
+  };
+
   if (range) {
     // Parse range header (format: "bytes=start-end")
     const rangeMatch = range.match(/bytes=(\d+)-(\d*)/);
@@ -37,6 +44,7 @@ export async function onRequestGet(ctx) {
           "Content-Range": `bytes ${start}-${end}/${file.size}`,
           "Content-Length": (end - start + 1).toString(),
           "Accept-Ranges": "bytes",
+          ...cacheHeaders,
         },
       });
     }
@@ -47,6 +55,7 @@ export async function onRequestGet(ctx) {
     headers: {
       "Content-Type": file.httpMetadata.contentType,
       "Accept-Ranges": "bytes",
+      ...cacheHeaders,
     },
   });
 }
