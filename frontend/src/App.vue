@@ -15,7 +15,6 @@
         <v-tab to="/offre">Offre de proximité</v-tab>
         <v-tab to="/demande">Demande de proximité</v-tab>
         <v-tab to="/comparaison">Comparaison</v-tab>
-        <v-tab to="/isochrones">Isochrones</v-tab>
       </v-tabs>
       <v-spacer />
       <v-btn @click="openInfos"> Infos </v-btn>
