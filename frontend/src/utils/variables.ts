@@ -32,23 +32,25 @@ export type TileParams = {
   maxzoom?: number;
 };
 
+const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/";
+
 export const listTilesParams: TileParams[] = [
   {
     name: "demand_h3",
-    url: "pmtiles://https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/demand_h3.pmtiles",
+    url: `pmtiles://${baseUrl}/demand_h3.pmtiles`,
   },
   {
     name: "demand_polygon",
-    url: "pmtiles://https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/demand_polygon.pmtiles",
+    url: `pmtiles://${baseUrl}/demand_polygon.pmtiles`,
   },
 
   {
     name: "supply_h3",
-    url: "pmtiles://https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/supply_h3.pmtiles",
+    url: `pmtiles://${baseUrl}/supply_h3.pmtiles`,
   },
   {
     name: "supply_polygon",
-    url: "pmtiles://https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/supply_polygon.pmtiles",
+    url: `pmtiles://${baseUrl}/supply_polygon.pmtiles`,
   },
 ];
 
