@@ -1,6 +1,11 @@
 export async function onRequestGet(ctx) {
   // Add debugging
-  if (!ctx.env || !ctx.env.MEDIA) {
+  if (!ctx.env) {
+    console.error("Environment variables are not configured");
+    return new Response("Environment variables not configured", {
+      status: 500,
+    });
+  } else if (!ctx.env.MEDIA) {
     console.error("R2 bucket binding MEDIA is not configured");
     return new Response("R2 bucket binding not configured", { status: 500 });
   }
