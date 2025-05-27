@@ -32,7 +32,7 @@ export type TileParams = {
   maxzoom?: number;
 };
 
-const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output/";
+const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output";
 
 export const listTilesParams: TileParams[] = [
   {
