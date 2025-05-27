@@ -30,7 +30,149 @@ path_demand_geneva_h3 = os.path.join(
 path_supply_h3 = os.path.join(data_folder, "supply", "All_CH_access_light_H3.pkl")
 path_supply_polygon = os.path.join(data_folder, "supply", "All_CH_access_light_TAZ.pkl")
 path_verkehrszonen = os.path.join(data_folder, "verkehrszonen.gpkg")
+path_hex_to_taz = os.path.join(data_folder, "hex_to_taz/hex_to_taz.pkl")
 
+
+# %% [markdown]
+# # Load demand h3 Geneva data
+
+# %%
+df = pd.read_pickle(path_demand_geneva_h3, compression="gzip")
+df = df[df["h3index"].notna()]
+df["h3index_int"] = df["h3index"].astype(numpy.int64)
+df["h3index"] = df["h3index_int"].apply(lambda x: h3.int_to_str(x))
+df.set_index("h3index", inplace=True)
+
+
+# %%
+# First, let's pivot the data to have separate columns for each year and proximity threshold combination
+df_combined = df.pivot_table(
+    index="h3index",
+    columns=["Proximity_threshold"],
+    values=["All_modes"],
+    aggfunc="first",  # Use 'first' since there should be only one value per combination
+)
+
+# Flatten the multi-level column names
+df_combined.columns = [f"{col[0]}_{col[1]}" for col in df_combined.columns]
+
+# Keep the Agglo column (it should be the same for all rows with same h3index)
+df_combined["Agglo"] = df.groupby("h3index")["Agglo"].first()
+
+
+# Reset index to have h3index as a column for h3pandas operations
+df_combined = df_combined.reset_index()
+df_combined = df_combined.set_index("h3index")
+
+
+# %%
+df_level9 = df_combined.copy()
+df_level9 = df_level9.h3.h3_to_geo_boundary()
+numeric_cols = df_level9.select_dtypes(include=[numpy.number]).columns
+
+for col in numeric_cols:
+    # Round all values
+    rounded_col = df_level9[col].round(4)
+    # Replace exact zeros back to 0 (not 0.0000)
+    df_level9[col] = numpy.where(df_level9[col] == 0, 0, rounded_col)
+
+
+# %%
+def aggregation(series):
+    if series.name == "Agglo":
+        return series.iloc[0]
+    else:
+        return series.mean().round(4)  # Example: return the mean of the series
+
+
+def to_parent_aggregate(df, level):
+    return df.h3.h3_to_parent_aggregate(level, operation=aggregation)
+
+
+def h3_to_geojson(df, level):
+    gdf = gpd.GeoDataFrame(df)
+
+    # Convert to GeoJSON string with drop_id option, then write to file
+    geojson_str = gdf.to_json(drop_id=True)
+
+    # Write the GeoJSON string to file
+    with open(
+        os.path.join("geojson", "demand_geneva_h3_level_" + level + ".geojson"), "w"
+    ) as f:
+        f.write(geojson_str)
+
+
+# %%
+# Aggregate to level 6
+df_level6 = to_parent_aggregate(df_combined, 6)
+
+# Aggregate to level 7
+df_level7 = to_parent_aggregate(df_combined, 7)
+# Aggregate to level 8
+df_level8 = to_parent_aggregate(df_combined, 8)
+
+# %%
+h3_to_geojson(df_level6, "6")
+h3_to_geojson(df_level7, "7")
+h3_to_geojson(df_level8, "8")
+h3_to_geojson(df_level9, "9")
+
+# %% [markdown]
+# # Demand polygon Geneva
+
+# %%
+df_hextaz = pd.read_pickle(path_hex_to_taz, compression="gzip")
+df_hextaz["hex_int"] = df_hextaz["h3index"].astype(numpy.int64)
+df_hextaz = df_hextaz.set_index("hex_int")
+df_hextaz.drop(columns=["h3index"], inplace=True)
+
+# %%
+df_hex = df_level9.copy()
+df_hex = df_hex.reset_index()
+df_hex["hex_int"] = df_hex["h3index"].apply(lambda x: h3.str_to_int(x))
+df_hex = df_hex.set_index("hex_int")
+df_hex.drop(columns=["geometry"], inplace=True)
+
+
+# %%
+df_merged = df_hex.merge(
+    df_hextaz[["taz_id"]], left_index=True, right_index=True, how="inner"
+)
+df_merged.drop(columns=["h3index"], inplace=True)
+df_merged.set_index("taz_id", inplace=True)
+
+# %%
+# load the verkehrszonen
+df_verkehrszonen = gpd.read_file(path_verkehrszonen)
+# df_verkehrszonen = df_verkehrszonen.drop_duplicates(subset=['id_zone'])
+# set index to the verkehrszonen
+df_verkehrszonen.set_index("id_zone", inplace=True)
+
+# %%
+df_merge = df_merged.merge(
+    df_verkehrszonen[["geometry"]], left_index=True, right_index=True, how="inner"
+)
+
+# %%
+df_merge = df_merge.reset_index()
+
+# %%
+df_agg = df_merge.groupby("taz_id").agg(
+    {
+        "All_modes_1300": "mean",
+        "All_modes_3800": "mean",
+        "All_modes_7000": "mean",
+        "Agglo": "first",
+        "geometry": "first",
+    }
+)
+
+# %%
+gdf = gpd.GeoDataFrame(df_agg)
+geojson_str = gdf.to_json(drop_id=True)
+
+with open(os.path.join("geojson", "demand_geneva_polygon.geojson"), "w") as f:
+    f.write(geojson_str)
 
 # %% [markdown]
 # # Load demand h3 data

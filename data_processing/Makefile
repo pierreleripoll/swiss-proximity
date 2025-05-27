@@ -5,8 +5,8 @@ GEOJSON_DIR = geojson
 # Common tippecanoe options
 TIPPECANOE_BASE = --coalesce-densest-as-needed --force
 
-# Default target
-all: $(OUTPUT_DIR)/demand_h3.pmtiles $(OUTPUT_DIR)/supply_h3.pmtiles
+# Default target - includes both general and Geneva-specific demand data
+all: $(OUTPUT_DIR)/demand_h3.pmtiles $(OUTPUT_DIR)/demand_geneva_h3.pmtiles $(OUTPUT_DIR)/supply_h3.pmtiles
 
 # Pattern rule for H3 tiles
 $(GEOJSON_DIR)/%_h3_6.pmtiles: $(GEOJSON_DIR)/%_h3_level_6.geojson
@@ -25,13 +25,24 @@ $(GEOJSON_DIR)/%_h3_9.pmtiles: $(GEOJSON_DIR)/%_h3_level_9.geojson
 $(OUTPUT_DIR)/%_h3.pmtiles: $(GEOJSON_DIR)/%_h3_6.pmtiles $(GEOJSON_DIR)/%_h3_7.pmtiles $(GEOJSON_DIR)/%_h3_8.pmtiles $(GEOJSON_DIR)/%_h3_9.pmtiles
 	tile-join --force -o $@ $^ -pk
 
-# Polygon tiles
+# Specific targets for convenience
+demand-tiles: $(OUTPUT_DIR)/demand_h3.pmtiles
+demand-geneva-tiles: $(OUTPUT_DIR)/demand_geneva_h3.pmtiles
+supply-tiles: $(OUTPUT_DIR)/supply_h3.pmtiles
+
+# Polygon tiles - general demand
 demand-tiles-polygon: $(OUTPUT_DIR)/demand_polygon.pmtiles
 
 $(OUTPUT_DIR)/demand_polygon.pmtiles: $(GEOJSON_DIR)/demand_polygon.geojson
 	tippecanoe -zg -Z0 -o $@ --layer=demand_polygon $(TIPPECANOE_BASE) -pk $<
 
-# Polygon tiles
+# Polygon tiles - Geneva demand
+demand-geneva-tiles-polygon: $(OUTPUT_DIR)/demand_geneva_polygon.pmtiles
+
+$(OUTPUT_DIR)/demand_geneva_polygon.pmtiles: $(GEOJSON_DIR)/demand_geneva_polygon.geojson
+	tippecanoe -zg -Z0 -o $@ --layer=demand_geneva_polygon $(TIPPECANOE_BASE) -pk $<
+
+# Polygon tiles - supply
 supply-tiles-polygon: $(OUTPUT_DIR)/supply_polygon.pmtiles
 
 $(OUTPUT_DIR)/supply_polygon.pmtiles: $(GEOJSON_DIR)/supply_polygon.geojson
@@ -45,4 +56,4 @@ clean:
 push-cdn: all
 	s3cmd put --recursive --acl-public --guess-mime-type $(OUTPUT_DIR) s3://${ENACIT_CDN_BUCKET}/lasur-swiss-proximity/
 
-.PHONY: all demand-tiles-polygon supply-tiles-polygon clean push-cdn
+.PHONY: all demand-tiles demand-geneva-tiles supply-tiles demand-tiles-polygon demand-geneva-tiles-polygon supply-tiles-polygon clean push-cdn
