@@ -146,7 +146,7 @@ export function expressionSum(
 
   const yearProxString =
     year !== undefined && distance !== undefined
-      ? "_" + distance.toString() + "_" + year.toString()
+      ? "_" + distance.toString()
       : "";
 
   // If there is only one attribute, return an expression that gets the value of the attribute

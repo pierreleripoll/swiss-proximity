@@ -37,12 +37,12 @@ const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output";
 // const baseUrl = "/pmtiles";
 export const listTilesParams: TileParams[] = [
   {
-    name: "demand_h3",
-    url: `pmtiles://${baseUrl}/demand_h3.pmtiles`,
+    name: "demand_geneva_h3",
+    url: `pmtiles://${baseUrl}/demand_geneva_h3.pmtiles`,
   },
   {
-    name: "demand_polygon",
-    url: `pmtiles://${baseUrl}/demand_polygon.pmtiles`,
+    name: "demand_geneva_polygon",
+    url: `pmtiles://${baseUrl}/demand_geneva_polygon.pmtiles`,
   },
 
   {

@@ -131,13 +131,11 @@ function onMove(e: MapLayerEventType["mousemove"]) {
   if (isDemand.value) {
     const variables: DemandVariable[] = props.demandVariables;
 
-    const proxyYearDistance = isDemand.value
-      ? "_" + props.distance + "_" + props.year
-      : "";
+    const proxyDistance = isDemand.value ? "_" + props.distance : "";
 
     const sumVariables = variables.reduce(
       (partialSum, attribute) =>
-        partialSum + (properties[attribute.id + proxyYearDistance] || 0),
+        partialSum + (properties[attribute.id + proxyDistance] || 0),
       0,
     );
     // POPUP DEMANDE
