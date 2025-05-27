@@ -32,9 +32,9 @@ export type TileParams = {
   maxzoom?: number;
 };
 
-const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output";
+// const baseUrl = "https://enacit4r-cdn.epfl.ch/lasur-swiss-proximity/output";
 // const baseUrl = "https://pub-3af0085660ba4a40b8af7561a4e80e7f.r2.dev";
-// const baseUrl = "/pmtiles";
+const baseUrl = "/pmtiles";
 export const listTilesParams: TileParams[] = [
   {
     name: "demand_geneva_h3",
