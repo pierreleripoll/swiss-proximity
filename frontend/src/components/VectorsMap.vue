@@ -56,6 +56,10 @@ import {
   geocoderAPI,
   mapBounds,
   expressionMax,
+  maxBoundsGeneva,
+  maxBoundsSwitzerland,
+  centerSwitzerland,
+  centerGeneva,
 } from "@/utils/map";
 
 import { cleanVariableString } from "@/utils/variables";
@@ -83,8 +87,6 @@ addProtocol("pmtiles", protocol.tile);
 const error = ref(false);
 const errorMessage = ref<string | null>(null);
 
-const center: LngLatLike = [7.95, 46.74];
-
 const props = withDefaults(
   defineProps<{
     demandVariables: DemandVariable[];
@@ -100,6 +102,17 @@ const props = withDefaults(
 );
 
 const isDemand = computed(() => props.selectedTilesName.includes("demand"));
+
+watch(
+  () => isDemand.value,
+  (newIsDemand) => {
+    if (newIsDemand) {
+      map?.fitBounds(maxBoundsGeneva);
+    } else {
+      map?.fitBounds(maxBoundsSwitzerland);
+    }
+  },
+);
 
 const mapColors = computed(() => props.colors.map((d) => d.color));
 
@@ -260,8 +273,11 @@ onMounted(() => {
     container: container.value as HTMLDivElement,
     style: "/style.json",
     zoom: 7,
-    center,
-    maxBounds: mapBounds,
+    fitBoundsOptions: {
+      padding: 20,
+    },
+    bounds: isDemand.value ? maxBoundsGeneva : maxBoundsSwitzerland,
+    minZoom: 6,
   }) as InstanceType<typeof Map>;
 
   map.on("load", function () {

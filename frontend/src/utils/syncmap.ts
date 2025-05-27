@@ -40,7 +40,7 @@ export function syncMaps(maps: Map[]) {
       map,
       maps.filter(function (o, i) {
         return i !== index;
-      })
+      }),
     );
   });
 
@@ -65,9 +65,13 @@ export function syncMaps(maps: Map[]) {
   }
 
   on();
-  return function () {
-    off();
-    fns = [];
-    maps = [];
+  sync(maps[0], maps.slice(1));
+  return {
+    sync,
+    off: () => {
+      off();
+      fns = [];
+      maps = [];
+    },
   };
 }

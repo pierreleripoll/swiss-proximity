@@ -1,5 +1,20 @@
-import type { ExpressionSpecification } from "maplibre-gl";
+import type {
+  ExpressionSpecification,
+  LngLatBoundsLike,
+  LngLatLike,
+} from "maplibre-gl";
 import { LngLat, LngLatBounds } from "maplibre-gl";
+
+export const maxBoundsSwitzerland: LngLatBoundsLike = [
+  5.790325, 45.63959, 10.120837, 47.853792,
+];
+
+export const maxBoundsGeneva: LngLatBoundsLike = [
+  5.712891, 45.890008, 6.789551, 46.619261,
+];
+
+export const centerGeneva: LngLatLike = [6.14569, 46.20222];
+export const centerSwitzerland: LngLatLike = [7.95, 46.74]; // Center of Switzerland
 
 export const publicStopsColors = [
   "match",

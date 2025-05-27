@@ -145,12 +145,12 @@ const defaultDemandVariables: DemandVariable[] = listVariablesDemand.map(
     id,
     name,
     selected: id == "All_modes",
-  })
+  }),
 );
 
 const storageKeyDemandVariables = "selectedDemandVariables",
   storageItemDemandVariables = sessionStorage.getItem(
-    storageKeyDemandVariables
+    storageKeyDemandVariables,
   ),
   savedDemandVariables = storageItemDemandVariables
     ? (JSON.parse(storageItemDemandVariables) as DemandVariable[])
@@ -171,12 +171,12 @@ const defaultSupplyVariables: SupplyVariable[] = listVariablesSupply.map(
     diversity: 5,
     infos,
     selected: id == "All",
-  })
+  }),
 );
 
 const storageKeySupplyVariables = "selectedSupplyVariables",
   storageItemSupplyVariables = sessionStorage.getItem(
-    storageKeySupplyVariables
+    storageKeySupplyVariables,
   ),
   savedSupplyVariables = storageItemSupplyVariables
     ? (JSON.parse(storageItemSupplyVariables) as SupplyVariable[])
@@ -187,13 +187,13 @@ const supplyVariables = ref<SupplyVariable[]>(savedSupplyVariables);
 const selectedSupplyVariables = computed(() => {
   //I added weight so it update props when weight change
   return supplyVariables.value.filter(
-    ({ selected, weight }) => selected && weight > 0
+    ({ selected, weight }) => selected && weight > 0,
   );
 });
 
 const selectedTilesSource = computed(() => {
   const filteredTiles = listTilesParams.filter(({ name }) =>
-    isHexagon.value ? name.includes("h3") : name.includes("polygon")
+    isHexagon.value ? name.includes("h3") : name.includes("polygon"),
   );
   return {
     demand: filteredTiles.find(({ name }) => name.includes("demand"))
@@ -217,22 +217,22 @@ const storageDistanceSource = "selectedDistance",
 const selectedDistance = ref(savedDistance);
 
 watch(selectedDistance, (newDistance) =>
-  sessionStorage.setItem(storageDistanceSource, newDistance.toString())
+  sessionStorage.setItem(storageDistanceSource, newDistance.toString()),
 );
 watch(selectedYear, (newYear) =>
-  sessionStorage.setItem(storageYearSource, newYear.toString())
+  sessionStorage.setItem(storageYearSource, newYear.toString()),
 );
 watch(selectedDemandVariables, () =>
   sessionStorage.setItem(
     storageKeyDemandVariables,
-    JSON.stringify(demandVariables.value)
-  )
+    JSON.stringify(demandVariables.value),
+  ),
 );
 watch(selectedSupplyVariables, () =>
   sessionStorage.setItem(
     storageKeySupplyVariables,
-    JSON.stringify(supplyVariables.value)
-  )
+    JSON.stringify(supplyVariables.value),
+  ),
 );
 
 watch(selectedTilingType, () => {
@@ -255,7 +255,7 @@ watch(
     if (leftMap !== undefined && rightMap !== undefined) {
       syncMaps([leftMap, rightMap]);
     }
-  }
+  },
 );
 </script>
 
