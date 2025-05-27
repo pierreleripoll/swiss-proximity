@@ -43,6 +43,11 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      "/output": {
+        target: "https://pub-3af0085660ba4a40b8af7561a4e80e7f.r2.dev/",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/output/, ""),
+      },
       "/maptiler": "http://localhost:80",
       "/traveltimeapi": "http://localhost:80",
       "/orsapi": "http://localhost:80",
